@@ -1,0 +1,44 @@
+{
+  "F1_2019_reg24": {
+    "alpha": 0.2,
+    "q": 0.6830595664729322,
+    "n_cal": 339023,
+    "n_cal_pred_over_100": 34,
+    "scale": "3 + std_24 + 0.2*|forecast|"
+  },
+  "F1_2019_reg48": {
+    "alpha": 0.2,
+    "q": 0.8662174636082226,
+    "n_cal": 338369,
+    "n_cal_pred_over_100": 0,
+    "scale": "3 + std_24 + 0.2*|forecast|"
+  },
+  "F2_2020_reg24": {
+    "alpha": 0.2,
+    "q": 0.6339006712752475,
+    "n_cal": 432823,
+    "n_cal_pred_over_100": 8134,
+    "scale": "3 + std_24 + 0.2*|forecast|"
+  },
+  "F2_2020_reg48": {
+    "alpha": 0.2,
+    "q": 0.7983363471724615,
+    "n_cal": 432837,
+    "n_cal_pred_over_100": 3608,
+    "scale": "3 + std_24 + 0.2*|forecast|"
+  },
+  "F3_2021-22_reg24": {
+    "alpha": 0.2,
+    "q": 0.7408985986001249,
+    "n_cal": 516762,
+    "n_cal_pred_over_100": 1,
+    "scale": "3 + std_24 + 0.2*|forecast|"
+  },
+  "F3_2021-22_reg48": {
+    "alpha": 0.2,
+    "q": 0.8821729221839023,
+    "n_cal": 516158,
+    "n_cal_pred_over_100": 1,
+    "scale": "3 + std_24 + 0.2*|forecast|"
+  }
+}

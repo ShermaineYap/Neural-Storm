@@ -1,0 +1,1011 @@
+{
+  "folds": {
+    "F1_2019": {
+      "train_end": "2019-01-01",
+      "calibration_start": "2018-05-22 23:00:00",
+      "test": [
+        "2019-01-01",
+        "2020-01-01"
+      ],
+      "n_fit": 785362,
+      "n_cal": 342757,
+      "n_test": 568836,
+      "regression_h24": {
+        "Persistence (API now)": {
+          "MAE": 7.126509130005578,
+          "RMSE": 12.300539732961026,
+          "n": 568291,
+          "MAE_haze": 36.37487627845596,
+          "n_haze": 12124,
+          "skill_vs_persistence": 0.0
+        },
+        "24-h mean persistence": {
+          "MAE": 7.791092738568396,
+          "RMSE": 13.255575730444201,
+          "n": 568194,
+          "MAE_haze": 40.521159807945864,
+          "n_haze": 12124,
+          "skill_vs_persistence": -0.0932551402712225
+        },
+        "Climatology (station x month x hour)": {
+          "MAE": 19.837030409118025,
+          "RMSE": 26.828522373270193,
+          "n": 566914,
+          "MAE_haze": 103.47099435522155,
+          "n_haze": 12124,
+          "skill_vs_persistence": -1.78355504037676
+        },
+        "Ridge regression": {
+          "MAE": 6.6990570171756705,
+          "RMSE": 11.247678440759524,
+          "n": 568291,
+          "MAE_haze": 38.02092958773087,
+          "n_haze": 12124,
+          "skill_vs_persistence": 0.05998057464490658
+        },
+        "MLP neural net (64-32)": {
+          "MAE": 7.554994153399782,
+          "RMSE": 13.265376804573721,
+          "n": 568291,
+          "MAE_haze": 54.402808817888264,
+          "n_haze": 12124,
+          "skill_vs_persistence": -0.060125513849424994
+        },
+        "LightGBM": {
+          "MAE": 7.243511612271098,
+          "RMSE": 13.13292203930091,
+          "n": 568291,
+          "MAE_haze": 53.15420744981217,
+          "n_haze": 12124,
+          "skill_vs_persistence": -0.01641792357676075
+        },
+        "HazeCast ensemble (LightGBM + Ridge)": {
+          "MAE": 6.695064986309092,
+          "RMSE": 11.66422064419319,
+          "n": 568291,
+          "MAE_haze": 43.95940946150247,
+          "n_haze": 12124,
+          "skill_vs_persistence": 0.06054074103124718
+        }
+      },
+      "conformal_h24": {
+        "empirical_coverage": 0.8286652436867732,
+        "mean_width": 22.318913237765905,
+        "by_predicted_band": {
+          "pred<50": {
+            "coverage": 0.737666768095383,
+            "mean_width": 19.187586908872827,
+            "n": 233333
+          },
+          "50-100": {
+            "coverage": 0.9025372755127966,
+            "mean_width": 23.622923672866744,
+            "n": 326689
+          },
+          ">100": {
+            "coverage": 0.4779296166404644,
+            "mean_width": 59.15963173661109,
+            "n": 8269
+          }
+        },
+        "coverage_when_actual_over_100": 0.30460244143846915,
+        "target_coverage": 0.8,
+        "q": 0.6830595664729322,
+        "n_cal_pred_over_100": 34
+      },
+      "regression_h48": {
+        "Persistence (API now)": {
+          "MAE": 8.991930233294738,
+          "RMSE": 15.362937050050565,
+          "n": 568294,
+          "MAE_haze": 46.53464203233256,
+          "n_haze": 12124,
+          "skill_vs_persistence": 0.0
+        },
+        "24-h mean persistence": {
+          "MAE": 9.140556211771123,
+          "RMSE": 15.464421311045667,
+          "n": 568196,
+          "MAE_haze": 46.99725750640295,
+          "n_haze": 12124,
+          "skill_vs_persistence": -0.016528818020191238
+        },
+        "Climatology (station x month x hour)": {
+          "MAE": 19.815451981204806,
+          "RMSE": 26.814633101864917,
+          "n": 566899,
+          "MAE_haze": 103.47099435522155,
+          "n_haze": 12124,
+          "skill_vs_persistence": -1.2036928075613211
+        },
+        "Ridge regression": {
+          "MAE": 8.331831671855046,
+          "RMSE": 13.915049276476113,
+          "n": 568294,
+          "MAE_haze": 52.876339262489665,
+          "n_haze": 12124,
+          "skill_vs_persistence": 0.07341010709753093
+        },
+        "LightGBM": {
+          "MAE": 9.921908037221858,
+          "RMSE": 16.96632292222928,
+          "n": 568294,
+          "MAE_haze": 75.90460061075814,
+          "n_haze": 12124,
+          "skill_vs_persistence": -0.10342360091759373
+        },
+        "HazeCast ensemble (LightGBM + Ridge)": {
+          "MAE": 8.67745265329525,
+          "RMSE": 14.782826529594683,
+          "n": 568294,
+          "MAE_haze": 63.375744727523255,
+          "n_haze": 12124,
+          "skill_vs_persistence": 0.03497331182965158
+        }
+      },
+      "conformal_h48": {
+        "empirical_coverage": 0.8235455591647985,
+        "mean_width": 27.69805297104236,
+        "by_predicted_band": {
+          "pred<50": {
+            "coverage": 0.7830536320226013,
+            "mean_width": 24.49003303065642,
+            "n": 260516
+          },
+          "50-100": {
+            "coverage": 0.8627236878023753,
+            "mean_width": 29.88181159111806,
+            "n": 304051
+          },
+          ">100": {
+            "coverage": 0.4577408103031929,
+            "mean_width": 73.78512852697162,
+            "n": 3727
+          }
+        },
+        "coverage_when_actual_over_100": 0.14566149785549323,
+        "target_coverage": 0.8,
+        "q": 0.8662174636082226,
+        "n_cal_pred_over_100": 0
+      },
+      "matched_budget_threshold": {
+        "rule_alert_rate_cal": 0.006451763852574564,
+        "threshold": 0.03470776446773564
+      },
+      "alert_24h": {
+        "LightGBM classifier (p>=0.2)": {
+          "precision": 0.8307829635297118,
+          "recall": 0.7376167562977639,
+          "F1": 0.7814327266184893,
+          "PR_AUC": 0.8406140495361548,
+          "brier": 0.00946119116819293,
+          "ECE": 0.0049100479755250885,
+          "positives": 17665,
+          "n": 568716,
+          "alerts": 15684
+        },
+        "LightGBM classifier (same alert budget as rule)": {
+          "precision": 0.479578689686272,
+          "recall": 0.8428530993489952,
+          "F1": 0.6113198250908419,
+          "PR_AUC": 0.8406140495361548,
+          "brier": 0.00946119116819293,
+          "ECE": 0.0049100479755250885,
+          "positives": 17665,
+          "n": 568716,
+          "alerts": 31046
+        },
+        "LightGBM classifier (p>=0.5)": {
+          "precision": 0.95412265489516,
+          "recall": 0.685196716671384,
+          "F1": 0.7976013969885671,
+          "PR_AUC": 0.8406140495361548,
+          "brier": 0.00946119116819293,
+          "ECE": 0.0049100479755250885,
+          "positives": 17665,
+          "n": 568716,
+          "alerts": 12686
+        },
+        "Rule: API now >= 80": {
+          "precision": 0.5320433222958058,
+          "recall": 0.8731955844891027,
+          "F1": 0.6612083931671561,
+          "PR_AUC": 0.46851657678024367,
+          "brier": 0.02779418901525542,
+          "ECE": 0.02779418901525542,
+          "positives": 17665,
+          "n": 568716,
+          "alerts": 28992
+        },
+        "Persistence: API now > 100": {
+          "precision": 0.9827614648630815,
+          "recall": 0.6744975941126521,
+          "F1": 0.7999597166739401,
+          "PR_AUC": 0.6729807381542486,
+          "brier": 0.01047798901384874,
+          "ECE": 0.010477989013848738,
+          "positives": 17665,
+          "n": 568716,
+          "alerts": 12124
+        }
+      },
+      "reliability": [
+        {
+          "p_mean": 0.0024901720243099804,
+          "freq": 0.007082336259702673,
+          "n": 548689
+        },
+        {
+          "p_mean": 0.14159872664489617,
+          "freq": 0.1724614321897306,
+          "n": 4343
+        },
+        {
+          "p_mean": 0.24328735764985604,
+          "freq": 0.24862553451435554,
+          "n": 1637
+        },
+        {
+          "p_mean": 0.3468153448295352,
+          "freq": 0.3567251461988304,
+          "n": 855
+        },
+        {
+          "p_mean": 0.44576786833049625,
+          "freq": 0.42292490118577075,
+          "n": 506
+        },
+        {
+          "p_mean": 0.5503246576269066,
+          "freq": 0.5484633569739953,
+          "n": 423
+        },
+        {
+          "p_mean": 0.6467860808872278,
+          "freq": 0.6432584269662921,
+          "n": 356
+        },
+        {
+          "p_mean": 0.7512757596268054,
+          "freq": 0.6777777777777778,
+          "n": 360
+        },
+        {
+          "p_mean": 0.8507683915652642,
+          "freq": 0.7804878048780488,
+          "n": 451
+        },
+        {
+          "p_mean": 0.9911006577138296,
+          "freq": 0.9955839942321557,
+          "n": 11096
+        }
+      ],
+      "onset_lead_time": {
+        "LightGBM classifier (p>=0.2)": {
+          "events": 169,
+          "detected": 116,
+          "detection_rate": 0.6863905325443787,
+          "median_lead_h": 9.0,
+          "mean_lead_h": 11.224137931034482
+        },
+        "LightGBM classifier (same alert budget as rule)": {
+          "events": 169,
+          "detected": 159,
+          "detection_rate": 0.9408284023668639,
+          "median_lead_h": 19.0,
+          "mean_lead_h": 16.138364779874212
+        },
+        "Rule: API now >= 80": {
+          "events": 169,
+          "detected": 166,
+          "detection_rate": 0.9822485207100592,
+          "median_lead_h": 17.5,
+          "mean_lead_h": 15.46987951807229
+        }
+      }
+    },
+    "F2_2020": {
+      "train_end": "2020-01-01",
+      "calibration_start": "2019-03-29 05:00:00",
+      "test": [
+        "2020-01-01",
+        "2021-01-01"
+      ],
+      "n_fit": 1024606,
+      "n_cal": 433085,
+      "n_test": 568609,
+      "regression_h24": {
+        "Persistence (API now)": {
+          "MAE": 7.236775023241948,
+          "RMSE": 9.78313473675673,
+          "n": 566863,
+          "MAE_haze": 43.651162790697676,
+          "n_haze": 86,
+          "skill_vs_persistence": 0.0
+        },
+        "24-h mean persistence": {
+          "MAE": 7.727336836540276,
+          "RMSE": 10.264791577062828,
+          "n": 566528,
+          "MAE_haze": 50.44961230699406,
+          "n_haze": 86,
+          "skill_vs_persistence": -0.06778735164805028
+        },
+        "Climatology (station x month x hour)": {
+          "MAE": 10.43709010708331,
+          "RMSE": 12.819212400697221,
+          "n": 566863,
+          "MAE_haze": 77.78980224077091,
+          "n_haze": 86,
+          "skill_vs_persistence": -0.4422294562927671
+        },
+        "Ridge regression": {
+          "MAE": 6.6904328548518786,
+          "RMSE": 8.711753144032045,
+          "n": 566863,
+          "MAE_haze": 52.51448103586255,
+          "n_haze": 86,
+          "skill_vs_persistence": 0.07549525398197576
+        },
+        "MLP neural net (64-32)": {
+          "MAE": 6.653418902731983,
+          "RMSE": 8.703020821335556,
+          "n": 566863,
+          "MAE_haze": 50.37352750415719,
+          "n_haze": 86,
+          "skill_vs_persistence": 0.08060995659481363
+        },
+        "LightGBM": {
+          "MAE": 6.546504297312232,
+          "RMSE": 8.534501079074765,
+          "n": 566863,
+          "MAE_haze": 49.015246303882236,
+          "n_haze": 86,
+          "skill_vs_persistence": 0.09538374810779815
+        },
+        "HazeCast ensemble (LightGBM + Ridge)": {
+          "MAE": 6.537678693767563,
+          "RMSE": 8.51855635258899,
+          "n": 566863,
+          "MAE_haze": 50.7648636698724,
+          "n_haze": 86,
+          "skill_vs_persistence": 0.0966032973567833
+        }
+      },
+      "conformal_h24": {
+        "empirical_coverage": 0.7362749024014621,
+        "mean_width": 18.732720609471173,
+        "by_predicted_band": {
+          "pred<50": {
+            "coverage": 0.6665438896306668,
+            "mean_width": 17.51448872738238,
+            "n": 369233
+          },
+          "50-100": {
+            "coverage": 0.866558045630955,
+            "mean_width": 21.008433070408866,
+            "n": 197629
+          },
+          ">100": {
+            "coverage": 0.0,
+            "mean_width": 83.3672972443787,
+            "n": 1
+          }
+        },
+        "coverage_when_actual_over_100": 0.0,
+        "target_coverage": 0.8,
+        "q": 0.6339006712752475,
+        "n_cal_pred_over_100": 8134
+      },
+      "regression_h48": {
+        "Persistence (API now)": {
+          "MAE": 8.89479725708554,
+          "RMSE": 11.804612475264022,
+          "n": 566259,
+          "MAE_haze": 59.97701149425287,
+          "n_haze": 87,
+          "skill_vs_persistence": 0.0
+        },
+        "24-h mean persistence": {
+          "MAE": 8.939490311941904,
+          "RMSE": 11.763927192592988,
+          "n": 565924,
+          "MAE_haze": 60.63218392996952,
+          "n_haze": 87,
+          "skill_vs_persistence": -0.0050246288436492925
+        },
+        "Climatology (station x month x hour)": {
+          "MAE": 10.44511840918277,
+          "RMSE": 12.835404359697701,
+          "n": 566259,
+          "MAE_haze": 80.95176538927802,
+          "n_haze": 87,
+          "skill_vs_persistence": -0.1742952770353765
+        },
+        "Ridge regression": {
+          "MAE": 8.020623359892166,
+          "RMSE": 10.220801854341195,
+          "n": 566259,
+          "MAE_haze": 65.22372576928345,
+          "n_haze": 87,
+          "skill_vs_persistence": 0.09827923806773797
+        },
+        "LightGBM": {
+          "MAE": 7.979361223822661,
+          "RMSE": 10.177360679772972,
+          "n": 566259,
+          "MAE_haze": 63.2920326810189,
+          "n_haze": 87,
+          "skill_vs_persistence": 0.10291814493395535
+        },
+        "HazeCast ensemble (LightGBM + Ridge)": {
+          "MAE": 7.895295578067741,
+          "RMSE": 10.056799000613948,
+          "n": 566259,
+          "MAE_haze": 64.25787922515119,
+          "n_haze": 87,
+          "skill_vs_persistence": 0.11236924801423676
+        }
+      },
+      "conformal_h48": {
+        "empirical_coverage": 0.7557124919868823,
+        "mean_width": 23.62000144706757,
+        "by_predicted_band": {
+          "pred<50": {
+            "coverage": 0.7046296537529636,
+            "mean_width": 22.41269582763245,
+            "n": 383830
+          },
+          "50-100": {
+            "coverage": 0.8631953428201811,
+            "mean_width": 26.15984929216992,
+            "n": 182428
+          },
+          ">100": {
+            "coverage": 0.0,
+            "mean_width": 84.37322289803657,
+            "n": 1
+          }
+        },
+        "coverage_when_actual_over_100": 0.0,
+        "target_coverage": 0.8,
+        "q": 0.7983363471724615,
+        "n_cal_pred_over_100": 3608
+      },
+      "matched_budget_threshold": {
+        "rule_alert_rate_cal": 0.06266439126448779,
+        "threshold": 0.01602543983114576
+      },
+      "alert_24h": {
+        "LightGBM classifier (p>=0.2)": {
+          "precision": 0.22493887530562348,
+          "recall": 0.25136612021857924,
+          "F1": 0.23741935483870968,
+          "PR_AUC": 0.22545788081864127,
+          "brier": 0.0006068258204352603,
+          "ECE": 0.001049331631261631,
+          "positives": 366,
+          "n": 568207,
+          "alerts": 409
+        },
+        "LightGBM classifier (same alert budget as rule)": {
+          "precision": 0.016206659463706904,
+          "recall": 0.45081967213114754,
+          "F1": 0.03128851806200816,
+          "PR_AUC": 0.22545788081864127,
+          "brier": 0.0006068258204352603,
+          "ECE": 0.001049331631261631,
+          "positives": 366,
+          "n": 568207,
+          "alerts": 10181
+        },
+        "LightGBM classifier (p>=0.5)": {
+          "precision": 0.8181818181818182,
+          "recall": 0.19672131147540983,
+          "F1": 0.31718061674008813,
+          "PR_AUC": 0.22545788081864127,
+          "brier": 0.0006068258204352603,
+          "ECE": 0.001049331631261631,
+          "positives": 366,
+          "n": 568207,
+          "alerts": 88
+        },
+        "Rule: API now >= 80": {
+          "precision": 0.07889009793253536,
+          "recall": 0.39617486338797814,
+          "F1": 0.13157894736842105,
+          "PR_AUC": 0.031643216533143205,
+          "brier": 0.0033684907084917995,
+          "ECE": 0.0033684907084918,
+          "positives": 366,
+          "n": 568207,
+          "alerts": 1838
+        },
+        "Persistence: API now > 100": {
+          "precision": 0.8620689655172413,
+          "recall": 0.20491803278688525,
+          "F1": 0.33112582781456956,
+          "PR_AUC": 0.17716561384249307,
+          "brier": 0.0005332563660778554,
+          "ECE": 0.0005332563660778555,
+          "positives": 366,
+          "n": 568207,
+          "alerts": 87
+        }
+      },
+      "reliability": [
+        {
+          "p_mean": 0.0011701062861426029,
+          "freq": 0.00045516131763908885,
+          "n": 566832
+        },
+        {
+          "p_mean": 0.13655592283214452,
+          "freq": 0.016563146997929608,
+          "n": 966
+        },
+        {
+          "p_mean": 0.24118159328853148,
+          "freq": 0.0639269406392694,
+          "n": 219
+        },
+        {
+          "p_mean": 0.3483423933112162,
+          "freq": 0.06666666666666667,
+          "n": 75
+        },
+        {
+          "p_mean": 0.44933426703498336,
+          "freq": 0.037037037037037035,
+          "n": 27
+        },
+        {
+          "p_mean": 0.9632694800021723,
+          "freq": 0.9642857142857143,
+          "n": 56
+        }
+      ],
+      "onset_lead_time": {
+        "LightGBM classifier (p>=0.2)": {
+          "events": 12,
+          "detected": 5,
+          "detection_rate": 0.4166666666666667,
+          "median_lead_h": 7.0,
+          "mean_lead_h": 7.6
+        },
+        "LightGBM classifier (same alert budget as rule)": {
+          "events": 12,
+          "detected": 9,
+          "detection_rate": 0.75,
+          "median_lead_h": 9.0,
+          "mean_lead_h": 10.555555555555555
+        },
+        "Rule: API now >= 80": {
+          "events": 12,
+          "detected": 9,
+          "detection_rate": 0.75,
+          "median_lead_h": 3.0,
+          "mean_lead_h": 7.666666666666667
+        }
+      }
+    },
+    "F3_2021-22": {
+      "train_end": "2021-01-01",
+      "calibration_start": "2020-02-02 03:00:00",
+      "test": [
+        "2021-01-01",
+        "2022-06-01"
+      ],
+      "n_fit": 1266200,
+      "n_cal": 518501,
+      "n_test": 763274,
+      "regression_h24": {
+        "Persistence (API now)": {
+          "MAE": 7.68340047488546,
+          "RMSE": 10.420637140718577,
+          "n": 759341,
+          "MAE_haze": 62.49700598802395,
+          "n_haze": 501,
+          "skill_vs_persistence": 0.0
+        },
+        "24-h mean persistence": {
+          "MAE": 8.266558163131647,
+          "RMSE": 11.041410071592157,
+          "n": 758950,
+          "MAE_haze": 65.30886096916275,
+          "n_haze": 501,
+          "skill_vs_persistence": -0.07589838511637392
+        },
+        "Climatology (station x month x hour)": {
+          "MAE": 11.6156919437048,
+          "RMSE": 14.361403912420917,
+          "n": 759341,
+          "MAE_haze": 87.35335094962053,
+          "n_haze": 501,
+          "skill_vs_persistence": -0.5117905127648523
+        },
+        "Ridge regression": {
+          "MAE": 7.042950269610676,
+          "RMSE": 9.24221327324946,
+          "n": 759341,
+          "MAE_haze": 65.07673443087977,
+          "n_haze": 501,
+          "skill_vs_persistence": 0.08335504668384874
+        },
+        "MLP neural net (64-32)": {
+          "MAE": 7.043449174685599,
+          "RMSE": 9.25275407411871,
+          "n": 759341,
+          "MAE_haze": 64.64397507409255,
+          "n_haze": 501,
+          "skill_vs_persistence": 0.08329011383587948
+        },
+        "LightGBM": {
+          "MAE": 6.852494349311011,
+          "RMSE": 8.995645845427434,
+          "n": 759341,
+          "MAE_haze": 64.06050201159444,
+          "n_haze": 501,
+          "skill_vs_persistence": 0.10814301926476577
+        },
+        "HazeCast ensemble (LightGBM + Ridge)": {
+          "MAE": 6.8797630039453255,
+          "RMSE": 9.03165618349469,
+          "n": 759341,
+          "MAE_haze": 64.51761518580406,
+          "n_haze": 501,
+          "skill_vs_persistence": 0.10459398459926228
+        }
+      },
+      "conformal_h24": {
+        "empirical_coverage": 0.7973716683281951,
+        "mean_width": 22.53136860972157,
+        "by_predicted_band": {
+          "pred<50": {
+            "coverage": 0.7369131845323764,
+            "mean_width": 20.51239133107622,
+            "n": 462049
+          },
+          "50-100": {
+            "coverage": 0.8915858967064709,
+            "mean_width": 25.626617414815318,
+            "n": 297037
+          },
+          ">100": {
+            "coverage": 0.6,
+            "mean_width": 75.32749920649691,
+            "n": 255
+          }
+        },
+        "coverage_when_actual_over_100": 0.0658682634730539,
+        "target_coverage": 0.8,
+        "q": 0.7408985986001249,
+        "n_cal_pred_over_100": 1
+      },
+      "regression_h48": {
+        "Persistence (API now)": {
+          "MAE": 9.536299345340485,
+          "RMSE": 12.698842379827475,
+          "n": 757493,
+          "MAE_haze": 66.99196787148594,
+          "n_haze": 498,
+          "skill_vs_persistence": 0.0
+        },
+        "24-h mean persistence": {
+          "MAE": 9.656088168291838,
+          "RMSE": 12.732258794301064,
+          "n": 757102,
+          "MAE_haze": 66.03162652134417,
+          "n_haze": 498,
+          "skill_vs_persistence": -0.01256135305881334
+        },
+        "Climatology (station x month x hour)": {
+          "MAE": 11.620002861525084,
+          "RMSE": 14.367063347827429,
+          "n": 757493,
+          "MAE_haze": 87.53782971317031,
+          "n_haze": 498,
+          "skill_vs_persistence": -0.21850231842844936
+        },
+        "Ridge regression": {
+          "MAE": 8.632020191672488,
+          "RMSE": 11.07333225492676,
+          "n": 757493,
+          "MAE_haze": 71.6284393559857,
+          "n_haze": 498,
+          "skill_vs_persistence": 0.09482495472521368
+        },
+        "LightGBM": {
+          "MAE": 8.46567288188254,
+          "RMSE": 10.890289281777846,
+          "n": 757493,
+          "MAE_haze": 70.16989856784377,
+          "n_haze": 498,
+          "skill_vs_persistence": 0.11226854618202209
+        },
+        "HazeCast ensemble (LightGBM + Ridge)": {
+          "MAE": 8.462534780792248,
+          "RMSE": 10.867103487230183,
+          "n": 757493,
+          "MAE_haze": 70.67774735808013,
+          "n_haze": 498,
+          "skill_vs_persistence": 0.11259761524504641
+        }
+      },
+      "conformal_h48": {
+        "empirical_coverage": 0.7866343319344206,
+        "mean_width": 26.856649246171518,
+        "by_predicted_band": {
+          "pred<50": {
+            "coverage": 0.7439252533561117,
+            "mean_width": 24.87098603423091,
+            "n": 474135
+          },
+          "50-100": {
+            "coverage": 0.8581648939926833,
+            "mean_width": 30.14703627654415,
+            "n": 283188
+          },
+          ">100": {
+            "coverage": 0.7470588235294118,
+            "mean_width": 83.76432357732251,
+            "n": 170
+          }
+        },
+        "coverage_when_actual_over_100": 0.06827309236947791,
+        "target_coverage": 0.8,
+        "q": 0.8821729221839023,
+        "n_cal_pred_over_100": 1
+      },
+      "matched_budget_threshold": {
+        "rule_alert_rate_cal": 0.003481960011503593,
+        "threshold": 0.08724747627904689
+      },
+      "alert_24h": {
+        "LightGBM classifier (p>=0.2)": {
+          "precision": 0.22314876584389592,
+          "recall": 0.4066869300911854,
+          "F1": 0.28817574843850957,
+          "PR_AUC": 0.3622112869368205,
+          "brier": 0.0019104749337673435,
+          "ECE": 0.002088375577394837,
+          "positives": 1645,
+          "n": 762403,
+          "alerts": 2998
+        },
+        "LightGBM classifier (same alert budget as rule)": {
+          "precision": 0.11525649566955364,
+          "recall": 0.5258358662613982,
+          "F1": 0.18907103825136612,
+          "PR_AUC": 0.3622112869368205,
+          "brier": 0.0019104749337673435,
+          "ECE": 0.002088375577394837,
+          "positives": 1645,
+          "n": 762403,
+          "alerts": 7505
+        },
+        "LightGBM classifier (p>=0.5)": {
+          "precision": 0.5774804905239688,
+          "recall": 0.3148936170212766,
+          "F1": 0.4075531077891424,
+          "PR_AUC": 0.3622112869368205,
+          "brier": 0.0019104749337673435,
+          "ECE": 0.002088375577394837,
+          "positives": 1645,
+          "n": 762403,
+          "alerts": 897
+        },
+        "Rule: API now >= 80": {
+          "precision": 0.11512111573281135,
+          "recall": 0.5720364741641337,
+          "F1": 0.1916692127507893,
+          "PR_AUC": 0.06677687330226442,
+          "brier": 0.010410504680595433,
+          "ECE": 0.010410504680595433,
+          "positives": 1645,
+          "n": 762403,
+          "alerts": 8174
+        },
+        "Persistence: API now > 100": {
+          "precision": 0.906187624750499,
+          "recall": 0.27598784194528875,
+          "F1": 0.42311276794035413,
+          "PR_AUC": 0.2516589328935272,
+          "brier": 0.0016238131277028028,
+          "ECE": 0.001623813127702803,
+          "positives": 1645,
+          "n": 762403,
+          "alerts": 501
+        }
+      },
+      "reliability": [
+        {
+          "p_mean": 0.0018317128743853025,
+          "freq": 0.0010649852688062508,
+          "n": 755879
+        },
+        {
+          "p_mean": 0.13984190694678958,
+          "freq": 0.048496880317640385,
+          "n": 3526
+        },
+        {
+          "p_mean": 0.2441092362431962,
+          "freq": 0.07192982456140351,
+          "n": 1140
+        },
+        {
+          "p_mean": 0.3466378139907834,
+          "freq": 0.054878048780487805,
+          "n": 656
+        },
+        {
+          "p_mean": 0.44502208318001873,
+          "freq": 0.10819672131147541,
+          "n": 305
+        },
+        {
+          "p_mean": 0.5500274659562142,
+          "freq": 0.1889400921658986,
+          "n": 217
+        },
+        {
+          "p_mean": 0.6458154925132079,
+          "freq": 0.264,
+          "n": 125
+        },
+        {
+          "p_mean": 0.7480027996625068,
+          "freq": 0.2604166666666667,
+          "n": 96
+        },
+        {
+          "p_mean": 0.8418847335783284,
+          "freq": 0.5106382978723404,
+          "n": 47
+        },
+        {
+          "p_mean": 0.9870813763911481,
+          "freq": 0.9587378640776699,
+          "n": 412
+        }
+      ],
+      "onset_lead_time": {
+        "LightGBM classifier (p>=0.2)": {
+          "events": 45,
+          "detected": 31,
+          "detection_rate": 0.6888888888888889,
+          "median_lead_h": 4.0,
+          "mean_lead_h": 7.32258064516129
+        },
+        "LightGBM classifier (same alert budget as rule)": {
+          "events": 45,
+          "detected": 34,
+          "detection_rate": 0.7555555555555555,
+          "median_lead_h": 9.5,
+          "mean_lead_h": 11.470588235294118
+        },
+        "Rule: API now >= 80": {
+          "events": 45,
+          "detected": 37,
+          "detection_rate": 0.8222222222222222,
+          "median_lead_h": 13.0,
+          "mean_lead_h": 11.594594594594595
+        }
+      }
+    }
+  },
+  "config": {
+    "alert_threshold": 0.2,
+    "cost_ratio_miss_to_false_alarm": 4.0,
+    "rule_baseline_threshold": 80.0,
+    "conformal_alpha": 0.2,
+    "regression_target": "delta: y(t+h) - API(t); forecast = API(t) + model",
+    "ensemble": "0.5 * LightGBM + 0.5 * Ridge (weights fixed a priori)",
+    "features": [
+      "api",
+      "lag_1",
+      "lag_2",
+      "lag_3",
+      "lag_6",
+      "lag_12",
+      "lag_24",
+      "lag_48",
+      "lag_72",
+      "lag_168",
+      "d_3",
+      "d_6",
+      "d_24",
+      "mean_6",
+      "mean_24",
+      "mean_72",
+      "max_24",
+      "std_24",
+      "missing_24",
+      "nbr_mean",
+      "nbr_max",
+      "nbr_d_6",
+      "reg_mean",
+      "reg_d_24",
+      "nat_median",
+      "nat_p90",
+      "nat_frac_over_100",
+      "nat_frac_over_70",
+      "nat_d_24",
+      "hour",
+      "dow",
+      "month_sin",
+      "month_cos",
+      "sw_monsoon",
+      "station_code"
+    ],
+    "train_start": "2013-01-01 07:00:00",
+    "data_end": "2022-05-07 11:00:00",
+    "n_station_hours": 3811451,
+    "n_stations": 67
+  },
+  "shap_global_reg24": {
+    "api": 4.271978914622797,
+    "d_24": 1.0521288319357927,
+    "reg_d_24": 0.789720196056037,
+    "lag_72": 0.7541045838498902,
+    "max_24": 0.7182106360189605,
+    "nat_median": 0.6663464971300246,
+    "lag_168": 0.6301503637196085,
+    "lag_48": 0.5982639857273558,
+    "station_code": 0.5870576566851119,
+    "lag_12": 0.5589969971705565,
+    "nat_d_24": 0.5366419517484434,
+    "nbr_d_6": 0.5126359607545136,
+    "lag_6": 0.48545162413937315,
+    "reg_mean": 0.4760521342301602,
+    "lag_2": 0.4512852359617737,
+    "d_3": 0.35586317847622934,
+    "mean_72": 0.31567585797641434,
+    "nbr_mean": 0.2987860597733568,
+    "nbr_max": 0.29628737454050347,
+    "dow": 0.2959673122594417,
+    "std_24": 0.28807181857370695,
+    "mean_6": 0.2706828490879167,
+    "nat_p90": 0.23978722711483966,
+    "sw_monsoon": 0.21527511975186325,
+    "mean_24": 0.20223994439084814,
+    "lag_1": 0.19132810031183653,
+    "lag_24": 0.1875419880894716,
+    "month_sin": 0.14274007447205742,
+    "lag_3": 0.1354427511210964,
+    "nat_frac_over_70": 0.1244553881962247,
+    "month_cos": 0.0683585310742563,
+    "d_6": 0.04687121672451679,
+    "hour": 0.03188539817159307,
+    "nat_frac_over_100": 0.027407761299750866,
+    "missing_24": 0.004787025745663786
+  },
+  "latency_all_stations_s": {
+    "median": 0.7886054420000619,
+    "n_stations": 67
+  },
+  "summary": {
+    "MAE_h24": {
+      "Persistence (API now)": 7.348894876044329,
+      "24-h mean persistence": 7.928329246080106,
+      "Climatology (station x month x hour)": 13.963270819968713,
+      "Ridge regression": 6.810813380546075,
+      "MLP neural net (64-32)": 7.083954076939121,
+      "LightGBM": 6.88083675296478,
+      "HazeCast ensemble (LightGBM + Ridge)": 6.704168894673994
+    },
+    "coverage_h24": 0.7874372714721435,
+    "MAE_h48": {
+      "Persistence (API now)": 9.141008945240253,
+      "24-h mean persistence": 9.245378230668289,
+      "Climatology (station x month x hour)": 13.960191083970889,
+      "Ridge regression": 8.328158407806567,
+      "LightGBM": 8.78898071430902,
+      "HazeCast ensemble (LightGBM + Ridge)": 8.34509433738508
+    },
+    "coverage_h48": 0.7886307943620339
+  },
+  "runtime_s": 897.8523654937744
+}

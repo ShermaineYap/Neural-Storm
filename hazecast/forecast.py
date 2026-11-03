@@ -1,15 +1,20 @@
 """Out-of-sample forecasting for any issue hour.
 
-For an issue time inside a walk-forward test period, the model of *that* fold is
-used, so every forecast shown in the app (including the 2019 haze replay) comes
-from a model that never saw that period. After the last test period the latest
-fold's model is used.
+For an issue time inside a walk-forward test period, the models of *that* fold
+are used, so every forecast shown in the app (including the 2019 haze replay)
+comes from models that never saw that period. After the last test period the
+latest fold's models are used.
+
+Forecast = API now + 0.5 * LightGBM(change) + 0.5 * Ridge(change).
+Explanations are exact additive contributions of that ensemble:
+TreeSHAP for LightGBM, coefficient x standardised feature for Ridge.
 """
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
+import joblib
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
@@ -20,6 +25,7 @@ from .features import FEATURES, build_feature_frames
 
 ART = Path(__file__).resolve().parent.parent / "artifacts"
 HISTORY_H = 200
+LINEAR_FEATS = [f for f in FEATURES if f != "station_code"]
 
 FOLD_PERIODS = [
     ("F1_2019", "2019-01-01", "2020-01-01"),
@@ -49,18 +55,39 @@ def fold_for(t: pd.Timestamp) -> str:
     return FOLD_PERIODS[0][0] if t < pd.Timestamp(FOLD_PERIODS[0][1]) else FOLD_PERIODS[-1][0]
 
 
+def ensemble_contributions(fc: "Forecaster", X: pd.DataFrame, fold: str, h: int):
+    """Exact per-feature contributions to the predicted change (and the base value)."""
+    lc = fc.model(f"{fold}_reg{h}").predict(X[FEATURES], pred_contrib=True)
+    l_contrib, l_base = lc[:, :-1], lc[:, -1]
+    pipe = fc.ridge(fold, h)
+    imp, sc, rg = pipe.named_steps["simpleimputer"], pipe.named_steps["standardscaler"], pipe.named_steps["ridge"]
+    Z = sc.transform(imp.transform(X[LINEAR_FEATS]))
+    r_contrib = Z * rg.coef_
+    r_full = np.zeros_like(l_contrib)
+    idx = [FEATURES.index(f) for f in LINEAR_FEATS]
+    r_full[:, idx] = r_contrib
+    return 0.5 * (l_contrib + r_full), 0.5 * (l_base + rg.intercept_)
+
+
 class Forecaster:
     def __init__(self, wide: pd.DataFrame | None = None, art_dir: Path | str = ART):
         self.art = Path(art_dir)
         self.wide = wide if wide is not None else load_wide()
         self.cal = json.loads((self.art / "conformal.json").read_text())
-        self.metrics = json.loads((self.art / "metrics.json").read_text()) if (self.art / "metrics.json").exists() else {}
+        mpath = self.art / "metrics.json"
+        self.metrics = json.loads(mpath.read_text()) if mpath.exists() else {}
         self.thr = self.metrics.get("config", {}).get("alert_threshold", 0.2)
-        self._models: dict[str, lgb.Booster] = {}
+        self._models: dict[str, object] = {}
 
     def model(self, key: str) -> lgb.Booster:
         if key not in self._models:
             self._models[key] = lgb.Booster(model_file=str(self.art / "models" / f"{key}.txt"))
+        return self._models[key]
+
+    def ridge(self, fold: str, h: int):
+        key = f"{fold}_ridge{h}"
+        if key not in self._models:
+            self._models[key] = joblib.load(self.art / "models" / f"{key}.joblib")
         return self._models[key]
 
     def _features(self, t_from: pd.Timestamp, t_to: pd.Timestamp, stations=None) -> pd.DataFrame:
@@ -73,23 +100,28 @@ class Forecaster:
         X.index.names = ["time", "station"]
         return X.astype("float32")
 
+    def predict_change(self, X: pd.DataFrame, fold: str, h: int) -> np.ndarray:
+        lg = self.model(f"{fold}_reg{h}").predict(X[FEATURES])
+        rd = self.ridge(fold, h).predict(X[LINEAR_FEATS])
+        return 0.5 * (lg + rd)
+
     def _predict(self, X: pd.DataFrame, fold: str, contrib: bool = False) -> pd.DataFrame:
         out = pd.DataFrame(index=X.index)
-        out["api_now"] = X["api"].to_numpy()
+        api = X["api"].to_numpy(dtype=float)
+        out["api_now"] = api
         for h in (24, 48):
-            # models predict the change from the current reading
-            p = X["api"].to_numpy(dtype=float) + self.model(f"{fold}_reg{h}").predict(X)
-            lo, hi = conformal.interval(p, self.cal[f"{fold}_reg{h}"])
+            p = api + self.predict_change(X, fold, h)
+            lo, hi = conformal.interval(p, self.cal[f"{fold}_reg{h}"], X["std_24"].to_numpy())
             out[f"pred_{h}"], out[f"lo_{h}"], out[f"hi_{h}"] = p, lo, hi
-        out["p_alert"] = self.model(f"{fold}_alert24").predict(X)
+        out["p_alert"] = self.model(f"{fold}_alert24").predict(X[FEATURES])
         out["missing_24"] = X["missing_24"].to_numpy()
         out["fold"] = fold
         if contrib:
-            c = self.model(f"{fold}_reg24").predict(X, pred_contrib=True)
-            cdf = pd.DataFrame(c[:, :-1], columns=FEATURES, index=X.index)
+            c, base = ensemble_contributions(self, X, fold, 24)
+            cdf = pd.DataFrame(c, columns=FEATURES, index=X.index)
             grouped = cdf.T.groupby(FEATURE_GROUP).sum().T
             out = out.join(grouped.add_prefix("drv::"))
-            out["base_value"] = c[:, -1]  # average predicted change (API points)
+            out["base_value"] = base  # average predicted 24-h change (API points)
         return out
 
     def forecast(self, t, contrib: bool = True) -> pd.DataFrame:

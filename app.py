@@ -32,6 +32,8 @@ h1, h2, h3, .headline {{ font-family: 'Bricolage Grotesque', sans-serif !importa
 .subline {{ font-size: 1.05rem; color: {MUTED}; max-width: 70ch; margin-bottom: 1.2rem; }}
 .pill {{ display:inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; font-weight: 600; font-size: 0.85rem; color: white; }}
 .drv {{ margin: 0.15rem 0; }}
+.card {{ padding: 0.2rem 0 0.8rem; }}
+.big {{ font-family: 'Bricolage Grotesque', sans-serif; font-size: 2.6rem; font-weight: 700; line-height: 1.1; color: {INK}; }}
 .note {{ font-size: 0.85rem; color: {MUTED}; }}
 section[data-testid="stSidebar"] {{ background: #DCE2E5; }}
 .stTabs [data-baseweb="tab"] {{ font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.05rem; }}
@@ -69,10 +71,11 @@ wide = fc.wide
 data_end = wide.index.max()
 
 PRESETS = {
-    "Sept 2019 haze: Klang Valley on the brink (16 Sep, 08:00)": "2019-09-16 08:00",
-    "Sept 2019 haze: Sarawak onset (09 Sep, 08:00)": "2019-09-09 08:00",
-    "Aug 2019 haze: first warning signs (01 Aug, 08:00)": "2019-08-01 08:00",
-    "Quiet day: monsoon season (15 Jan 2021, 08:00)": "2021-01-15 08:00",
+    "Sept 2019 peak: Klang Valley and Melaka (17 Sep, 08:00)": "2019-09-17 08:00",
+    "Sept 2019: Sarawak at its worst (7 Sep, 20:00)": "2019-09-07 20:00",
+    "Sept 2019: haze building in Kuching (5 Sep, 08:00)": "2019-09-05 08:00",
+    "Near miss: Klang Valley peaked at 94 (11 Aug 2019, 08:00)": "2019-08-11 08:00",
+    "Quiet day in the monsoon (15 Jan 2021, 08:00)": "2021-01-15 08:00",
     f"Latest data in archive ({data_end:%d %b %Y %H:00})": str(data_end),
 }
 
@@ -137,14 +140,17 @@ with tab_map:
             cats = cats.where(df["action"] != "INSUFFICIENT DATA", "No data")
             colours = cats.map(CATEGORY_COLOURS)
             label = cats
-        hover = (df["station"] + " (" + df["state"] + ")<br>Now: " + df["api_now"].round(0).astype("Int64").astype(str)
-                 + "<br>+24 h: " + df["pred_24"].round(0).astype(int).astype(str)
-                 + " [" + df["lo_24"].round(0).astype(int).astype(str) + "–" + df["hi_24"].round(0).astype(int).astype(str) + "]"
-                 + "<br>P(Unhealthy in 24 h): " + (df["p_alert"] * 100).round(0).astype(int).astype(str) + "%"
-                 + "<br>" + df["action"])
+        def fmt(v):
+            return "–" if pd.isna(v) else f"{v:.0f}"
+
+        hover = [f"{r.station} ({r.state})<br>Now: {fmt(r.api_now)}<br>+24 h: {fmt(r.pred_24)} "
+                 f"[{fmt(r.lo_24)}–{fmt(r.hi_24)}]<br>P(Unhealthy in 24 h): "
+                 f"{'–' if pd.isna(r.p_alert) else f'{r.p_alert:.0%}'}<br>{r.action}"
+                 for r in df.itertuples()]
         fig = go.Figure(go.Scattermap(
-            lat=df["lat"], lon=df["lon"], mode="markers",
-            marker=dict(size=np.clip(9 + df["pred_24"] / 9, 10, 34), color=colours, opacity=0.9),
+            lat=df["lat"].tolist(), lon=df["lon"].tolist(), mode="markers",
+            marker=dict(size=np.clip(9 + df["pred_24"].fillna(0).to_numpy() / 9, 10, 34).tolist(),
+                        color=list(colours), opacity=0.9),
             text=hover, hoverinfo="text"))
         fig.update_layout(map=dict(style="carto-positron", center=dict(lat=4.0, lon=108.5), zoom=4.3),
                           margin=dict(l=0, r=0, t=0, b=0), height=470, paper_bgcolor=SMOKE)
@@ -175,11 +181,17 @@ with tab_station:
     names = sorted(STATIONS)
     station = st.selectbox("Station", names, index=names.index(default))
     r = dec.loc[station]
+    def card(col, label, value, sub, colour=None):
+        dot = f"<span class='pill' style='background:{colour}'>{sub}</span>" if colour else f"<span class='note'>{sub}</span>"
+        col.markdown(f"<div class='card'><div class='note'>{label}</div><div class='big'>{value}</div>{dot}</div>",
+                     unsafe_allow_html=True)
+
     a, b, c, d_ = st.columns(4)
-    a.metric("API now", "–" if np.isnan(r["api_now"]) else f"{r['api_now']:.0f}", api_category(r["api_now"]))
-    b.metric("+24 h forecast", f"{r['pred_24']:.0f}", f"80% interval {r['lo_24']:.0f}–{r['hi_24']:.0f}", delta_color="off")
-    c.metric("+48 h forecast", f"{r['pred_48']:.0f}", f"80% interval {r['lo_48']:.0f}–{r['hi_48']:.0f}", delta_color="off")
-    d_.metric("Chance of Unhealthy in 24 h", f"{r['p_alert']:.0%}", r["action"], delta_color="off")
+    cat_now = api_category(r["api_now"])
+    card(a, "API now", "–" if np.isnan(r["api_now"]) else f"{r['api_now']:.0f}", cat_now, CATEGORY_COLOURS[cat_now])
+    card(b, "+24 h forecast", f"{r['pred_24']:.0f}", f"80% range {r['lo_24']:.0f}–{r['hi_24']:.0f}")
+    card(c, "+48 h forecast", f"{r['pred_48']:.0f}", f"80% range {r['lo_48']:.0f}–{r['hi_48']:.0f}")
+    card(d_, "Chance of Unhealthy within 24 h", f"{r['p_alert']:.0%}", r["action"], ACTION_COLOURS[r["action"]])
     st.markdown(f"<span class='pill' style='background:{ACTION_COLOURS[r['action']]}'>{r['action']}</span> "
                 f"{r['reason']} Episode type: <b>{r['episode']}</b>.", unsafe_allow_html=True)
 
@@ -226,8 +238,8 @@ with tab_station:
         base = drv["base_value"]
         now_txt = "–" if np.isnan(drv["api_now"]) else f"{drv['api_now']:.0f}"
         st.markdown(f"<p class='note'>Tomorrow's forecast = API now ({now_txt}) + typical 24-h change "
-                    f"({base:+.0f}) + the drivers below. Contributions are exact TreeSHAP values from the "
-                    f"+24 h model.</p>", unsafe_allow_html=True)
+                    f"({base:+.0f}) + the drivers below. Contributions are exact: TreeSHAP for LightGBM and "
+                    f"coefficient × feature for Ridge, averaged like the ensemble.</p>", unsafe_allow_html=True)
         gb = go.Figure(go.Bar(
             x=list(groups.values())[::-1], y=list(groups.keys())[::-1], orientation="h",
             marker_color=[OCHRE if v > 0 else "#4F7A8A" for v in list(groups.values())[::-1]]))
@@ -286,8 +298,12 @@ with tab_evidence:
                 cf = f[f"conformal_h{h}"]
                 crow.append({"Test period": fname.split("_", 1)[1], "Horizon": f"+{h} h",
                              "Coverage": cf["empirical_coverage"], "Mean width": cf["mean_width"],
-                             "Coverage when forecast > 100": cf["by_predicted_band"].get(">100", {}).get("coverage", np.nan)})
+                             "Coverage when forecast > 100": cf["by_predicted_band"].get(">100", {}).get("coverage", np.nan),
+                             "Coverage when actual > 100": cf.get("coverage_when_actual_over_100", np.nan)})
         st.dataframe(pd.DataFrame(crow).round(3), use_container_width=True, hide_index=True)
+        st.markdown("<p class='note'>Overall coverage is close to the 80% target. During haze it is well "
+                    "below, because each calibration window held only a handful of haze forecasts. Treat "
+                    "haze-time ranges as optimistic.</p>", unsafe_allow_html=True)
         st.markdown("**Alert probability calibration (reliability)**")
         rel = folds[list(folds)[0]]["reliability"]
         rf = go.Figure()
@@ -300,7 +316,7 @@ with tab_evidence:
                          xaxis_title="Predicted probability", yaxis_title="Observed frequency")
         st.plotly_chart(rf, use_container_width=True)
     with cc2:
-        st.markdown("**What the +24 h model relies on (mean |SHAP|, 2021–22 test)**")
+        st.markdown("**What the +24 h ensemble relies on (mean |contribution|, 2021–22 test)**")
         sh = metrics.get("shap_global_reg24", {})
         top = list(sh.items())[:12][::-1]
         sf = go.Figure(go.Bar(x=[v for _, v in top], y=[k for k, _ in top], orientation="h", marker_color=OCHRE))

@@ -6,7 +6,8 @@ Folds (test periods never seen in training):
   F3: train 2013-2020  -> test 2021-01 .. 2022-05
 
 Within each training window the final 15% of hours is held out as a
-calibration set (early stopping, conformal intervals). The alert threshold is
+calibration set, used only for the conformal intervals and the matched-budget
+alert threshold (models are never fitted or early-stopped on it). The alert threshold is
 fixed in advance from a cost ratio (a missed Unhealthy day costs 4x a false
 alarm -> p >= 1/(1+4) = 0.2); it is never tuned on test data.
 
@@ -20,6 +21,7 @@ import json
 import time
 from pathlib import Path
 
+import joblib
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
@@ -43,7 +45,10 @@ FOLDS = [
 COST_RATIO = 4.0
 ALERT_THR = 1.0 / (1.0 + COST_RATIO)
 RULE_THR = 80.0  # simple heuristic baseline: warn when API is already >= 80
-LGB_REG = dict(n_estimators=800, learning_rate=0.05, num_leaves=63, min_child_samples=100,
+# Tree counts are fixed in advance (no early stopping): the calibration window straddles
+# the 2019 haze, and early-stopping on it stopped one fold after 12 trees. Keeping the
+# calibration set out of model fitting also keeps the conformal intervals clean.
+LGB_REG = dict(n_estimators=400, learning_rate=0.05, num_leaves=63, min_child_samples=100,
                subsample=0.8, subsample_freq=1, colsample_bytree=0.8, reg_lambda=1.0,
                n_jobs=2, verbose=-1)
 LGB_CLF = dict(LGB_REG, objective="binary")
@@ -56,15 +61,13 @@ def log(*a):
 
 def fit_lgb_reg(Xtr, ytr, Xca, yca):
     m = lgb.LGBMRegressor(**LGB_REG)
-    m.fit(Xtr, ytr, eval_set=[(Xca, yca)], categorical_feature=["station_code"],
-          callbacks=[lgb.early_stopping(50, verbose=False)])
+    m.fit(Xtr, ytr, categorical_feature=["station_code"])
     return m
 
 
 def fit_lgb_clf(Xtr, ytr, Xca, yca):
     m = lgb.LGBMClassifier(**LGB_CLF)
-    m.fit(Xtr, ytr, eval_set=[(Xca, yca)], categorical_feature=["station_code"],
-          callbacks=[lgb.early_stopping(50, verbose=False)])
+    m.fit(Xtr, ytr, categorical_feature=["station_code"])
     return m
 
 
@@ -94,6 +97,7 @@ def main(quick: bool = False):
         "alert_threshold": ALERT_THR, "cost_ratio_miss_to_false_alarm": COST_RATIO,
         "rule_baseline_threshold": RULE_THR, "conformal_alpha": 0.2,
         "regression_target": "delta: y(t+h) - API(t); forecast = API(t) + model",
+        "ensemble": "0.5 * LightGBM + 0.5 * Ridge (weights fixed a priori)",
         "features": FEATURES, "train_start": str(wide.index.min()),
         "data_end": str(wide.index.max()), "n_station_hours": int(len(long)),
         "n_stations": int(wide.shape[1]),
@@ -154,41 +158,35 @@ def main(quick: bool = False):
                 log(f"mlp {time.time() - t1:.1f}s")
             t1 = time.time()
             m = fit_lgb_reg(ft[FEATURES], d_ft, ca[FEATURES], d_ca)
-            log(f"lgb reg h{h} {time.time() - t1:.1f}s best_iter={m.best_iteration_}")
-            preds["LightGBM (HazeCast)"] = api_te + m.predict(X_te)
+            log(f"lgb reg h{h} {time.time() - t1:.1f}s")
+            preds["LightGBM"] = api_te + m.predict(X_te)
             m.booster_.save_model(str(ART / "models" / f"{name}_reg{h}.txt"))
+            joblib.dump(ridge, ART / "models" / f"{name}_ridge{h}.joblib")
+            # HazeCast = equal-weight ensemble of LightGBM (non-linear, strong on normal days)
+            # and Ridge (extrapolates linearly into record haze levels). Weights fixed a priori.
+            preds["HazeCast ensemble (LightGBM + Ridge)"] = 0.5 * (preds["LightGBM"] + preds["Ridge regression"])
 
-            cal_pred = ca["api"].to_numpy(dtype=float) + m.predict(ca[FEATURES])
-            cal = conformal.fit(cal_pred, ca[yname].to_numpy(dtype=float), alpha=0.2)
+            api_ca = ca["api"].to_numpy(dtype=float)
+            cal_pred = api_ca + 0.5 * (m.predict(ca[FEATURES]) + ridge.predict(ca[LINEAR_FEATS]))
+            cal = conformal.fit(cal_pred, ca[yname].to_numpy(dtype=float), ca["std_24"].to_numpy(), alpha=0.2)
             conformal_all[f"{name}_reg{h}"] = cal
-            lgb_pred = preds["LightGBM (HazeCast)"]
-            lo, hi = conformal.interval(lgb_pred, cal)
-            ok = ~np.isnan(y_te)
-            cov_by_band = {}
-            for (blo, bhi), lab in zip([(0, 50), (50, 100), (100, 1e9)], ["pred<50", "50-100", ">100"]):
-                s = ok & (lgb_pred >= blo) & (lgb_pred < bhi)
-                if s.sum():
-                    cov_by_band[lab] = {"coverage": float(np.mean((y_te[s] >= lo[s]) & (y_te[s] <= hi[s]))),
-                                        "n": int(s.sum())}
+            ens = preds["HazeCast ensemble (LightGBM + Ridge)"]
+            lo, hi = conformal.interval(ens, cal, test["std_24"].to_numpy())
             pers_mae = reg_metrics(y_te, preds["Persistence (API now)"])["MAE"]
             fold[f"regression_h{h}"] = {
                 k: dict(reg_metrics(y_te, v), skill_vs_persistence=1 - reg_metrics(y_te, v)["MAE"] / pers_mae)
                 for k, v in preds.items()
             }
-            fold[f"conformal_h{h}"] = {
-                "target_coverage": 0.8,
-                "empirical_coverage": float(np.mean((y_te[ok] >= lo[ok]) & (y_te[ok] <= hi[ok]))),
-                "mean_width": float(np.mean(hi[ok] - lo[ok])),
-                "by_predicted_band": cov_by_band,
-                "half_widths": cal["half_widths"],
-            }
+            fold[f"conformal_h{h}"] = dict(conformal.coverage_report(ens, y_te, lo, hi),
+                                           target_coverage=0.8, q=cal["q"],
+                                           n_cal_pred_over_100=cal["n_cal_pred_over_100"])
 
         # ---- alert classifier ----
         ft = fit_part[fit_part["alert_24"].notna()]
         ca = cal_part[cal_part["alert_24"].notna()]
         t1 = time.time()
         clf = fit_lgb_clf(ft[FEATURES], ft["alert_24"], ca[FEATURES], ca["alert_24"])
-        log(f"lgb clf {time.time() - t1:.1f}s best_iter={clf.best_iteration_}")
+        log(f"lgb clf {time.time() - t1:.1f}s")
         clf.booster_.save_model(str(ART / "models" / f"{name}_alert24.txt"))
         y_te = test["alert_24"].to_numpy(dtype=float)
         p = clf.predict_proba(X_te)[:, 1]
@@ -229,8 +227,11 @@ def main(quick: bool = False):
         if name == FOLDS[-1][0]:
             # global SHAP-style attribution via LightGBM's exact TreeSHAP contributions
             samp = test.sample(min(len(test), 20_000), random_state=0)
-            booster = lgb.Booster(model_file=str(ART / "models" / f"{name}_reg24.txt"))
-            contrib = booster.predict(samp[FEATURES], pred_contrib=True)[:, :-1]
+            from hazecast.forecast import Forecaster, ensemble_contributions
+            with open(ART / "conformal.json", "w") as f:
+                json.dump(conformal_all, f, indent=2)
+            fc0 = Forecaster(wide=wide)
+            contrib = ensemble_contributions(fc0, samp[FEATURES], name, 24)[0]
             imp = np.abs(contrib).mean(axis=0)
             results["shap_global_reg24"] = dict(sorted(zip(FEATURES, imp.astype(float).tolist()),
                                                        key=lambda kv: -kv[1]))
@@ -240,10 +241,7 @@ def main(quick: bool = False):
                 results["shap_haze_hours_reg24"] = dict(sorted(zip(FEATURES, imp_h.astype(float).tolist()),
                                                                key=lambda kv: -kv[1]))
             # latency: forecast every station for one issue hour, including feature build
-            from hazecast.forecast import Forecaster
-            with open(ART / "conformal.json", "w") as f:
-                json.dump(conformal_all, f, indent=2)
-            fc = Forecaster(wide=wide)
+            fc = fc0
             t_issue = wide.index[-1]
             fc.forecast(t_issue)
             runs = []

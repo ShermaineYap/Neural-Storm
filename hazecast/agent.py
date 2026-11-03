@@ -62,6 +62,7 @@ def decide_row(station: str, r: pd.Series, thr: float) -> Decision:
     else:
         action = "CLEAR"
         reason = f"{p:.0%} chance of Unhealthy; tomorrow's 80% interval tops out at {r['hi_24']:.0f}."
+        episode = "No episode"
     return Decision(station, action, reason, episode, drivers)
 
 

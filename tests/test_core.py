@@ -43,16 +43,23 @@ def test_targets_look_forward():
 def test_conformal_coverage_on_exchangeable_data():
     rng = np.random.default_rng(1)
     pred = rng.uniform(0, 150, 20000)
-    y = pred + rng.normal(0, 10, 20000)
-    cal = conformal.fit(pred[:10000], y[:10000], alpha=0.2)
-    cov = conformal.coverage(pred[10000:], y[10000:], cal)
-    assert 0.77 < cov < 0.83
+    std = rng.uniform(0, 10, 20000)
+    y = pred + rng.normal(0, 1, 20000) * conformal.difficulty(pred, std) * 0.5
+    cal = conformal.fit(pred[:10000], y[:10000], std[:10000], alpha=0.2)
+    lo, hi = conformal.interval(pred[10000:], cal, std[10000:])
+    rep = conformal.coverage_report(pred[10000:], y[10000:], lo, hi)
+    assert 0.77 < rep["empirical_coverage"] < 0.83
+    # normalised scores keep coverage roughly equal across levels
+    assert abs(rep["by_predicted_band"][">100"]["coverage"] - 0.8) < 0.05
 
 
-def test_conformal_lower_bound_non_negative():
-    cal = {"bands": [0, 50, 100, 1e9], "half_widths": [30, 30, 30]}
-    lo, hi = conformal.interval(np.array([5.0]), cal)
-    assert lo[0] == 0.0 and hi[0] == 35.0
+def test_conformal_width_grows_with_volatility_and_level():
+    cal = {"q": 1.0}
+    lo1, hi1 = conformal.interval(np.array([40.0]), cal, np.array([2.0]))
+    lo2, hi2 = conformal.interval(np.array([150.0]), cal, np.array([30.0]))
+    assert (hi2 - lo2)[0] > (hi1 - lo1)[0]
+    lo3, _ = conformal.interval(np.array([1.0]), {"q": 5.0}, np.array([10.0]))
+    assert lo3[0] == 0.0
 
 
 def test_onset_and_lead_time():

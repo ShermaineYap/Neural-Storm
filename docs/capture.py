@@ -13,7 +13,7 @@ OUT = "docs/img"
 
 def wait_ready(page):
     page.wait_for_selector("text=HazeAgent bulletin", timeout=180_000)
-    time.sleep(3)
+    time.sleep(8)
 
 
 def main():
