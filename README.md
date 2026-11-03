@@ -2,7 +2,7 @@
 
 **Neural Storm 2026 · Track 2: Green Planet · Problem statement GP-01 (Air Quality Monitoring & Source Attribution)**
 **Team:** HazeCast (solo): Shermaine Yap Shi Min, Asia Pacific University of Technology & Innovation, Malaysia
-**Live demo:** _Streamlit Cloud link added at deployment_ · **Code:** this repository (MIT licence)
+**Live demo:** https://hazecast-my.streamlit.app · **Code:** this repository (MIT licence)
 
 ![HazeCast MY map and bulletin on 17 Sep 2019, the peak of the 2019 haze](docs/img/map.png)
 
